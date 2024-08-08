@@ -7,13 +7,13 @@ CORS(app)
 
 @app.route("/api/stock/<string:symbol>", methods=["GET"])
 def get_stock_data(symbol):
-    option = request.args.get("option")  # Seçilen seçeneği al
+    option = request.args.get("option")
     try:
         print(f"Received symbol: {symbol}, option: {option}")
-        stock = yf.Ticker(symbol + ".IS")  # BIST için .IS ekleyin
+        stock = yf.Ticker(symbol + ".IS")  
         print(f"Ticker created: {stock}")
 
-        # Farklı dönemler için tarihsel verileri almak
+        
         periods = {
             "1d": "1d",
             "1mo": "1mo",
@@ -22,17 +22,16 @@ def get_stock_data(symbol):
             "1y": "1y"
         }
 
-        if option == "1d":  # Anlık fiyat
+        if option == "1d":
             data = stock.history(period="1d")
-            price = data['Close'].iloc[0]  # Anlık fiyatı al
+            price = data['Close'].iloc[0]  
             return f"Anlık fiyat: {price}"
 
-        elif option in periods:  # Diğer dönem seçenekleri
+        elif option in periods:  
             data = stock.history(period=periods[option])
             prices = data['Close'].to_dict()
-            prices_str = "\n".join([f"{date.date()}: " + "\t\t" + str(price) for date, price in prices.items()])  # İki tab ekledik
+            prices_str = "\n".join([f"{date.date()}: " + "\t\t" + str(price) for date, price in prices.items()])  
 
-            # Başlıkları belirle
             title_mapping = {
                 "1mo": "1 Aylık Kapanış Fiyatları:",
                 "3mo": "3 Aylık Kapanış Fiyatları:",
@@ -40,12 +39,11 @@ def get_stock_data(symbol):
                 "1y": "1 Yıllık Kapanış Fiyatları:"
             }
             title = title_mapping.get(option, "Kapanış Fiyatları:")
-            return f"{title}\n{prices_str}"  # Dönem bilgisi ile birlikte döndür
+            return f"{title}\n{prices_str}"  
 
-        elif option == "info":  # Hisse Senedi Bilgileri
+        elif option == "info":  
             info = stock.info
-            
-            # Türkçe anahtar isimleri ile bilgileri listele
+
             translated_info = {
                 "symbol": "Sembol",
                 "shortName": "Kısa İsim",
